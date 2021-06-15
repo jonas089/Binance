@@ -6,8 +6,12 @@ import pickle
 
 try:
     open('history.dat', 'x')
+    open('first.dat', 'x')
 except Exception as exists:
     pass
+with open('first.dat', 'wb') as first:
+    initial_data = [{'ADA':True}, {'DOT':True}, {'ETH':True}, {'LTC':True}]
+    pickle.dump(initial_data, history)
 with open('history.dat', 'wb') as history:
     initial_data = [{'ADA':0}, {'DOT':0}, {'ETH':0}, {'LTC':0}]
     pickle.dump(initial_data, history)
@@ -41,21 +45,39 @@ def Action():
     if len(amount) > 5:
         amount = amount[:5]
     print('Max_Amount: ' + str(amount))
+    issafe = False
+    if 'sell' in str(data):
+        with open('first.dat', 'rb') as first:
+            is_first = pickle.loads(first)
+            if is_first[ticker] ==  True:
+                is_first[ticker] = False
+                issafe = True
+        if issafe == True:
+            with open('first.dat', 'wb') as first:
+                pickle.dump(is_first, first)
+            return 0
+
 
     if 'buy' in str(data) and Balance() > 1:
         client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=float(amount))
         with open('history.dat', 'rb') as history:
-            history_bu = pickle.load(history)
+            history_bu = pickle.loads(history)
         with open('history.dat', 'wb') as history:
             history_bu[ticker] = float(amount)
             pickle.dump(history_bu, history)
+        with open('first.dat', 'rb') as first:
+            is_first = pickle.loads(first)
+            is_first[ticker] = False
+        with open('first.dat', 'wb') as first:
+            pickle.dump(is_first, first)
+
     elif 'sell' in str(data):
         with open('history.dat', 'rb') as history:
-            positioned_amount = pickle.load(history)[ticker]
+            positioned_amount = pickle.loads(history)[ticker]
         client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=positioned_amount)
     else:
         print('Warning: ' + str(data))
-    return action
+    return 0
 
 def OpenOrders():
     orders = client.futures_get_open_orders()
