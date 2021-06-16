@@ -40,38 +40,6 @@ def Action():
     data = request.json['action']
     print(data)
     ticker = request.json['ticker']
-    try:
-        print(request.json)
-    except Exception as E:
-        print('Fail.')
-    try:
-        print(request.get_json())
-    except Exception as E:
-        print('Fail.')
-    try:
-        print(request.form)
-    except Exception as E:
-        print('Fail.')
-    try:
-        print(request.form[0])
-    except Exception as E:
-        print('Fail.')
-    try:
-        print(request.form[0]['action'])
-    except Exception as E:
-        print('Fail.')
-    try:
-        print(request.data)
-    except Exception as E:
-        print('Fail.')
-    try:
-        print(request.data[0])
-    except Exception as E:
-        print('Fail.')
-    try:
-        print(request.text)
-    except Exception as E:
-        print('Fail.')
 
     amount = str(Balance()/Price(ticker))
     if len(amount) > 5:
@@ -80,7 +48,7 @@ def Action():
     issafe = False
     if 'sell' in str(data):
         with open('first.dat', 'rb') as first:
-            is_first = pickle.loads(first)
+            is_first = pickle.load(first)
             if is_first[ticker] ==  True:
                 is_first[ticker] = False
                 issafe = True
@@ -93,19 +61,19 @@ def Action():
     if 'buy' in str(data) and Balance():
         client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=float(amount))
         with open('history.dat', 'rb') as history:
-            history_bu = pickle.loads(history)
+            history_bu = pickle.load(history)
         with open('history.dat', 'wb') as history:
             history_bu[ticker] = float(amount)
             pickle.dump(history_bu, history)
         with open('first.dat', 'rb') as first:
-            is_first = pickle.loads(first)
+            is_first = pickle.load(first)
             is_first[ticker] = False
         with open('first.dat', 'wb') as first:
             pickle.dump(is_first, first)
 
     elif 'sell' in str(data) and Balance():
         with open('history.dat', 'rb') as history:
-            positioned_amount = pickle.loads(history)[ticker]
+            positioned_amount = pickle.load(history)[ticker]
         client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=positioned_amount)
     else:
         print('Warning: ' + str(data))
