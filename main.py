@@ -59,7 +59,6 @@ def Action():
 
 
     if str(data) == 'buy':
-        return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=float(amount))
         with open('history.dat', 'rb') as history:
             history_bu = pickle.load(history)
         with open('history.dat', 'wb') as history:
@@ -70,6 +69,7 @@ def Action():
             is_first[ticker] = False
         with open('first.dat', 'wb') as first:
             pickle.dump(is_first, first)
+        return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=float(amount))
 
     elif str(data) == 'sell':
         with open('history.dat', 'rb') as history:
