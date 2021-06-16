@@ -1,5 +1,5 @@
 from binance.client import Client
-from flask import Flask
+from flask import Flask, request
 import time
 import json
 import pickle
@@ -11,7 +11,7 @@ except Exception as exists:
     pass
 with open('first.dat', 'wb') as first:
     initial_data = [{'ADA':True}, {'DOT':True}, {'ETH':True}, {'LTC':True}]
-    pickle.dump(initial_data, history)
+    pickle.dump(initial_data, first)
 with open('history.dat', 'wb') as history:
     initial_data = [{'ADA':0}, {'DOT':0}, {'ETH':0}, {'LTC':0}]
     pickle.dump(initial_data, history)
@@ -37,9 +37,9 @@ def Price(ticker):
 
 @app.route('/action', methods=['POST'])
 def Action():
-    data = request.get_json()
+    data = request.get_json()['action']
     print(data)
-    ticker = data[:3]
+    ticker = request.get_json()['ticker']
 
     amount = str(Balance()/Price(ticker))
     if len(amount) > 5:
@@ -58,7 +58,7 @@ def Action():
             return 0
 
 
-    if 'buy' in str(data) and Balance() > 1:
+    if 'buy' in str(data) and Balance():
         client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=float(amount))
         with open('history.dat', 'rb') as history:
             history_bu = pickle.loads(history)
@@ -71,7 +71,7 @@ def Action():
         with open('first.dat', 'wb') as first:
             pickle.dump(is_first, first)
 
-    elif 'sell' in str(data):
+    elif 'sell' in str(data) and Balance():
         with open('history.dat', 'rb') as history:
             positioned_amount = pickle.loads(history)[ticker]
         client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=positioned_amount)
