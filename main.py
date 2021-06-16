@@ -37,9 +37,41 @@ def Price(ticker):
 
 @app.route('/action', methods=['POST'])
 def Action():
-    data = request.get_json()['action']
+    data = request.json['action']
     print(data)
-    ticker = request.get_json()['ticker']
+    ticker = request.json['ticker']
+    try:
+        print(request.json)
+    except Exception as E:
+        print('Fail.')
+    try:
+        print(request.get_json())
+    except Exception as E:
+        print('Fail.')
+    try:
+        print(request.form)
+    except Exception as E:
+        print('Fail.')
+    try:
+        print(request.form[0])
+    except Exception as E:
+        print('Fail.')
+    try:
+        print(request.form[0]['action'])
+    except Exception as E:
+        print('Fail.')
+    try:
+        print(request.data)
+    except Exception as E:
+        print('Fail.')
+    try:
+        print(request.data[0])
+    except Exception as E:
+        print('Fail.')
+    try:
+        print(request.text)
+    except Exception as E:
+        print('Fail.')
 
     amount = str(Balance()/Price(ticker))
     if len(amount) > 5:
