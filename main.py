@@ -10,10 +10,10 @@ try:
 except Exception as exists:
     pass
 with open('first.dat', 'wb') as first:
-    initial_data = [{'ADA':True}, {'DOT':True}, {'ETH':True}, {'LTC':True}]
+    initial_data = {'ADA':True, 'DOT':True, 'ETH':True, 'LTC':True}
     pickle.dump(initial_data, first)
 with open('history.dat', 'wb') as history:
-    initial_data = [{'ADA':0}, {'DOT':0}, {'ETH':0}, {'LTC':0}]
+    initial_data = {'ADA':0, 'DOT':0, 'ETH':0, 'LTC':0}
     pickle.dump(initial_data, history)
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
 secret_key = 'sYOZrlfkgcRpteYXUhYSvEmrngpwCu6TIdxhKYTXqMXzXJEQ1NCiFYW1AwD1MUvv'
@@ -58,8 +58,8 @@ def Action():
             return 0
 
 
-    if 'buy' in str(data) and Balance():
-        client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=float(amount))
+    if str(data) == 'buy':
+        return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=float(amount))
         with open('history.dat', 'rb') as history:
             history_bu = pickle.load(history)
         with open('history.dat', 'wb') as history:
@@ -71,10 +71,10 @@ def Action():
         with open('first.dat', 'wb') as first:
             pickle.dump(is_first, first)
 
-    elif 'sell' in str(data) and Balance():
+    elif str(data) == 'sell':
         with open('history.dat', 'rb') as history:
             positioned_amount = pickle.load(history)[ticker]
-        client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=positioned_amount)
+        return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=positioned_amount)
     else:
         print('Warning: ' + str(data))
     return 0
