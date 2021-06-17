@@ -4,16 +4,17 @@ import time
 import json
 import pickle
 
+leverages = {'ADA':1, 'DOT':2, 'ETH':4, 'LTC':1, 'XMR':7}
 try:
     open('history.dat', 'x')
     open('first.dat', 'x')
 except Exception as exists:
     pass
 with open('first.dat', 'wb') as first:
-    initial_data = {'ADA':True, 'DOT':True, 'ETH':True, 'LTC':True}
+    initial_data = {'ADA':True, 'DOT':True, 'ETH':True, 'LTC':True, 'XMR':True}
     pickle.dump(initial_data, first)
 with open('history.dat', 'wb') as history:
-    initial_data = {'ADA':0, 'DOT':0, 'ETH':0, 'LTC':0}
+    initial_data = {'ADA':0, 'DOT':0, 'ETH':0, 'LTC':0, 'XMR':0}
     pickle.dump(initial_data, history)
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
 secret_key = 'sYOZrlfkgcRpteYXUhYSvEmrngpwCu6TIdxhKYTXqMXzXJEQ1NCiFYW1AwD1MUvv'
@@ -69,12 +70,12 @@ def Action():
             is_first[ticker] = False
         with open('first.dat', 'wb') as first:
             pickle.dump(is_first, first)
-        return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(amount) * 4))
+        return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(amount) * leverages[ticker]))
 
     elif str(data) == 'sell':
         with open('history.dat', 'rb') as history:
             positioned_amount = pickle.load(history)[ticker]
-        return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * 4))
+        return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverages[ticker]))
     else:
         print('Warning: ' + str(data))
     return 0
