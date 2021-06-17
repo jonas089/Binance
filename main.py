@@ -41,7 +41,7 @@ def Action():
     print(data)
     ticker = request.json['ticker']
 
-    amount = str(Balance()/Price(ticker))
+    amount = str(Balance()/Price(ticker)) * 0.5
     if len(amount) > 5:
         amount = amount[:5]
     print('Max_Amount: ' + str(amount))
