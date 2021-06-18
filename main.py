@@ -119,22 +119,21 @@ def Action():
             with open('positions.dat', 'wb') as pos:
                 with open('history.dat', 'rb') as history:
                     positioned_amount = pickle.load(history)[ticker]
+                    client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverage))
 
-                if position == 'None':
-                    with open('positions.dat', 'wb') as pos:
-                        positions[ticker] = 'Sell'
-                        pickle.dump(positions, pos)
-                positions[ticker] = 'None'
+        with open('positions.dat', 'wb') as pos:
+            positions[ticker] = 'Sell'
+            pickle.dump(positions, pos)
+        #positions[ticker] = 'None'
                 # Close old position and open new Long position,
-                client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverage))
-                positions[ticker] = 'Sell'
-                # comment above out, to only entry long / short. Keep active, to enter short & long.
-                pickle.dump(positions, pos)
+        #positions[ticker] = 'Sell'
+        # comment above out, to only entry long / short. Keep active, to enter short & long.
+        #pickle.dump(positions, pos)
 
         return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(amount * leverage))
     else:
         print('Warning: ' + str(data))
-    return 0
+        return 'Invalid request data.'
 
 def OpenOrders():
     orders = client.futures_get_open_orders()
