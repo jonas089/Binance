@@ -3,29 +3,34 @@ from flask import Flask, request
 import time
 import json
 import pickle
-# Create Files
-try:
-    open('history.dat', 'x')
-    open('first.dat', 'x')
-    open('positions.dat', 'x')
-    open('leverages.dat', 'x')
-except Exception as exists:
-    print('Warning! Files exist.')
+import os
+# (RE)Create Files
+files = ['history.dat', 'first.dat', 'positions.dat', 'leverages.dat', 'precisions.dat']
+for f in range(0, len(files)):
+    try:
+        os.remove(files[f])
+    except Exception as nofile:
+        pass
+    try:
+        open(files[f], 'x')
+    except Exception as exists:
+        print('Warning! Files exist.')
 
 # Instantiate
 with open('first.dat', 'wb') as first:
-    initial_data = {'ADA':True, 'DOT':True, 'ETH':True, 'LTC':True} #'XMR':True} XMR - Futures Price not supported by API
+    initial_data = {'ADA':True, 'DOT':True, 'ETH':True} #'XMR':True} XMR - Futures Price not supported by API
     pickle.dump(initial_data, first)
 with open('history.dat', 'wb') as history:
-    initial_data = {'ADA':0, 'DOT':0, 'ETH':0, 'LTC':0} #'XMR':0} XMR - Futures Price not supported by API
+    initial_data = {'ADA':0, 'DOT':0, 'ETH':0} #'XMR':0} XMR - Futures Price not supported by API
     pickle.dump(initial_data, history)
 with open('positions.dat', 'wb') as pos:
     positions = {'ADA':'None', 'DOT':'None', 'ETH':'None'} #'XMR':'None'} XMR - Futures Price not supported by API
     pickle.dump(positions, pos)
 with open('leverages.dat', 'wb') as lev:
-    leverages = {'ADA':1, 'DOT':2, 'ETH':5, 'LTC':1} #'XMR':4} XMR - Futures Price not supported by API
+    leverages = {'ADA':1, 'DOT':2, 'ETH':5} #'XMR':4} XMR - Futures Price not supported by API
     pickle.dump(leverages, lev)
-
+with open('precisions.dat', 'wb') as pre:
+    precisions = {'ADA':1, 'DOT':2, 'ETH':3}
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
 secret_key = 'sYOZrlfkgcRpteYXUhYSvEmrngpwCu6TIdxhKYTXqMXzXJEQ1NCiFYW1AwD1MUvv'
 app = Flask(__name__)
@@ -55,10 +60,10 @@ def Action():
     except Exception as FormatError:
         data = request.json['action']
         ticker = request.json['ticker']
+    with open('precisions.dat', 'rb') as precisions:
+        asset_precision = pickle.load(precisions)[ticker]
 
-    amount = str(Balance()/Price(ticker)*0.33)
-    if len(amount) > 2:
-        amount = amount[:2]
+    amount = str((Balance()/Price(ticker)*0.33).round(asset_precision))
     print('Max_Amount: ' + str(amount))
     #issafe = False
     #if 'sell' in str(data):
