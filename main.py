@@ -14,16 +14,16 @@ except Exception as exists:
 
 # Instantiate
 with open('first.dat', 'wb') as first:
-    initial_data = {'ADA':True, 'DOT':True, 'ETH':True, 'LTC':True, 'XMR':True}
+    initial_data = {'ADA':True, 'DOT':True, 'ETH':True, 'LTC':True} #'XMR':True} XMR - Futures Price not supported by API
     pickle.dump(initial_data, first)
 with open('history.dat', 'wb') as history:
-    initial_data = {'ADA':0, 'DOT':0, 'ETH':0, 'LTC':0, 'XMR':0}
+    initial_data = {'ADA':0, 'DOT':0, 'ETH':0, 'LTC':0} #'XMR':0} XMR - Futures Price not supported by API
     pickle.dump(initial_data, history)
 with open('positions.dat', 'wb') as pos:
-    positions = {'ADA':'None', 'DOT':'None', 'ETH':'None', 'XMR':'None'}
+    positions = {'ADA':'None', 'DOT':'None', 'ETH':'None'} #'XMR':'None'} XMR - Futures Price not supported by API
     pickle.dump(positions, pos)
 with open('leverages.dat', 'wb') as lev:
-    leverages = {'ADA':1, 'DOT':2, 'ETH':5, 'LTC':1, 'XMR':4}
+    leverages = {'ADA':1, 'DOT':2, 'ETH':5, 'LTC':1} #'XMR':4} XMR - Futures Price not supported by API
     pickle.dump(leverages, lev)
 
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
@@ -48,9 +48,13 @@ def Price(ticker):
 
 @app.route('/action', methods=['POST'])
 def Action():
-    data = request.get_json()['action']
-    print(data)
-    ticker = request.get_json()['ticker']
+    try:
+        data = request.get_json()['action']
+        print(data)
+        ticker = request.get_json()['ticker']
+    except Exception as FormatError:
+        data = request.json['action']
+        ticker = request.json['ticker']
 
     amount = str(Balance()/Price(ticker)*0.33)
     if len(amount) > 5:
