@@ -57,8 +57,8 @@ def Action():
         ticker = request.json['ticker']
 
     amount = str(Balance()/Price(ticker)*0.33)
-    if len(amount) > 5:
-        amount = amount[:5]
+    if len(amount) > 2:
+        amount = amount[:2]
     print('Max_Amount: ' + str(amount))
     #issafe = False
     #if 'sell' in str(data):
