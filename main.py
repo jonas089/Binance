@@ -23,7 +23,7 @@ with open('positions.dat', 'wb') as pos:
     positions = {'ADA':'None', 'DOT':'None', 'ETH':'None', 'XMR':'None'}
     pickle.dump(positions, pos)
 with open('leverages.dat', 'wb') as lev:
-    leverages = {'ADA':1, 'DOT':2, 'ETH':4, 'LTC':1, 'XMR':7}
+    leverages = {'ADA':1, 'DOT':2, 'ETH':5, 'LTC':1, 'XMR':4}
     pickle.dump(leverages, lev)
 
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
@@ -52,7 +52,7 @@ def Action():
     print(data)
     ticker = request.json['ticker']
 
-    amount = str(Balance()/Price(ticker)) * 0.5
+    amount = str(Balance()/Price(ticker)) * 0.33
     if len(amount) > 5:
         amount = amount[:5]
     print('Max_Amount: ' + str(amount))
