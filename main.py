@@ -31,6 +31,7 @@ with open('leverages.dat', 'wb') as lev:
     pickle.dump(leverages, lev)
 with open('precisions.dat', 'wb') as pre:
     precisions = {'ADA':1, 'DOT':2, 'ETH':3}
+    pickle.dump(precisions, pre)
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
 secret_key = 'sYOZrlfkgcRpteYXUhYSvEmrngpwCu6TIdxhKYTXqMXzXJEQ1NCiFYW1AwD1MUvv'
 app = Flask(__name__)
