@@ -48,11 +48,11 @@ def Price(ticker):
 
 @app.route('/action', methods=['POST'])
 def Action():
-    data = request.json['action']
+    data = request.get_json()['action']
     print(data)
-    ticker = request.json['ticker']
+    ticker = request.get_json()['ticker']
 
-    amount = str(Balance()/Price(ticker)) * 0.33
+    amount = str(Balance()/Price(ticker)*0.33)
     if len(amount) > 5:
         amount = amount[:5]
     print('Max_Amount: ' + str(amount))
