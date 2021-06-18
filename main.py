@@ -60,17 +60,17 @@ def Action():
     if len(amount) > 5:
         amount = amount[:5]
     print('Max_Amount: ' + str(amount))
-    issafe = False
-    if 'sell' in str(data):
-        with open('first.dat', 'rb') as first:
-            is_first = pickle.load(first)
-            if is_first[ticker] ==  True:
-                is_first[ticker] = False
-                issafe = True
-        if issafe == True:
-            with open('first.dat', 'wb') as first:
-                pickle.dump(is_first, first)
-            return 0
+    #issafe = False
+    #if 'sell' in str(data):
+        #with open('first.dat', 'rb') as first:
+        #    is_first = pickle.load(first)
+        #    if is_first[ticker] ==  True:
+        #        is_first[ticker] = False
+        #        issafe = True
+        #if issafe == True:
+        #    with open('first.dat', 'wb') as first:
+        #        pickle.dump(is_first, first)
+        #    return 0
     with open('leverages.dat', 'rb') as lev:
         leverages = pickle.load(lev)
         leverage = float(leverages[ticker])
@@ -130,7 +130,7 @@ def Action():
         # comment above out, to only entry long / short. Keep active, to enter short & long.
         #pickle.dump(positions, pos)
 
-        return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(amount * leverage))
+        return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(float(amount) * leverage))
     else:
         print('Warning: ' + str(data))
         return 'Invalid request data.'
