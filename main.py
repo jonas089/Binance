@@ -139,12 +139,6 @@ def Action():
             with open('positions.dat', 'wb') as pos:
                 with open('history.dat', 'rb') as history:
                     positioned_amount = pickle.load(history)[ticker]
-
-                if position == 'None':
-                    with open('positions.dat', 'wb') as pos:
-                        positions[ticker] = 'Sell'
-                        pickle.dump(positions, pos)
-                positions[ticker] = 'None'
                 # Close old position and open new Long position,
                 client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(positioned_amount) * leverage))
                 positions[ticker] = 'Buy'
