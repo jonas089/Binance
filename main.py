@@ -5,7 +5,7 @@ import json
 import pickle
 import os
 # (RE)Create Files
-files = ['history.dat', 'first.dat', 'positions.dat', 'leverages.dat', 'precisions.dat', 'strategies.dat', 'log.txt']
+files = ['history.dat', 'first.dat', 'positions.dat', 'leverages.dat', 'precisions.dat', 'strategies.dat', 'log.txt', 'tradelog.txt']
 for f in range(0, len(files)):
     try:
         os.remove(files[f])
@@ -35,7 +35,9 @@ with open('precisions.dat', 'wb') as pre:
 with open('strategies.dat', 'wb') as sg:
     strategies = {'ETH':'None','ADA':'None','DOT':'None'}
 with open('log.txt', 'w') as log:
-    log.write('[DEBUG]:')
+    log.write('[DEBUG]: ' + '\n')
+with open('tradelog.txt', 'w') as tradelog:
+    log.write('[Trades]: ' + '\n')
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
 secret_key = 'sYOZrlfkgcRpteYXUhYSvEmrngpwCu6TIdxhKYTXqMXzXJEQ1NCiFYW1AwD1MUvv'
 app = Flask(__name__)
@@ -58,6 +60,7 @@ def Price(ticker):
 
 @app.route('/action', methods=['POST'])
 def Action():
+    timestamp = str(time.time())
     try:
         data = request.get_json()['action']
         print(data)
@@ -109,6 +112,13 @@ def Action():
         with open('strategies.dat', 'wb') as sg:
             pickle.dump(strategies, sg)
     if str(data) == 'buy':
+        #LOG
+        with open('tradelog.txt', 'r') as tradelog:
+            trade_log = tradelog.read()
+        with open('tradelog.txt', 'w') as tradelog:
+            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'BUY' + '\n'
+            tradelog.write(trade_log)
+
         with open('history.dat', 'rb') as history:
             history_bu = pickle.load(history)
         with open('history.dat', 'wb') as history:
@@ -143,6 +153,13 @@ def Action():
         return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(amount) * leverage))
 
     elif str(data) == 'sell':
+        #LOG
+        with open('tradelog.txt', 'r') as tradelog:
+            trade_log = tradelog.read()
+        with open('tradelog.txt', 'w') as tradelog:
+            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'SELL' + '\n'
+            tradelog.write(trade_log)
+
 
         if position == 'Buy':
             with open('positions.dat', 'wb') as pos:
