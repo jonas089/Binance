@@ -150,6 +150,9 @@ def Action():
                 positions[ticker] = 'Buy'
                 # comment above out, to only entry long / short. Keep active, to enter short & long.
                 pickle.dump(positions, pos)
+        elif position == 'Buy':
+            print('Already bought.')
+            return 'Already bought.'
 
         return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(amount) * leverage))
 
@@ -160,14 +163,17 @@ def Action():
         with open('tradelog.txt', 'w') as tradelog:
             trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'SELL' + '\n'
             tradelog.write(trade_log)
-
-
         if position == 'Buy':
+            with open('history.dat', 'rb') as history:
+                positioned_amount = pickle.load(history)[ticker]
+                client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverage))
+        elif position == 'None':
             with open('positions.dat', 'wb') as pos:
-                with open('history.dat', 'rb') as history:
-                    positioned_amount = pickle.load(history)[ticker]
-                    client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverage))
-
+                positions[ticker] = 'Sell'
+                pickle.dump(positions, pos)
+        elif position == 'Sell':
+            print('Already sold.')
+            return('Already sold.')
         with open('positions.dat', 'wb') as pos:
             positions[ticker] = 'Sell'
             pickle.dump(positions, pos)
