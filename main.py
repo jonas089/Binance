@@ -30,7 +30,7 @@ with open('leverages.dat', 'wb') as lev:
     leverages = {'ADA':5, 'DOT':2, 'ETH':5} #'XMR':4} XMR - Futures Price not supported by API
     pickle.dump(leverages, lev)
 with open('precisions.dat', 'wb') as pre:
-    precisions = {'ADA':1, 'DOT':2, 'ETH':3}
+    precisions = {'ADA':1, 'DOT':1, 'ETH':3}
     pickle.dump(precisions, pre)
 with open('strategies.dat', 'wb') as sg:
     strategies = {'ETH':'None','ADA':'None','DOT':'None'}
@@ -74,7 +74,7 @@ def Action():
     with open('precisions.dat', 'rb') as precisions:
         asset_precision = pickle.load(precisions)[ticker]
 
-    amount = str(round((Balance()/Price(ticker)*0.5), asset_precision))
+    amount = str(round((Balance()/Price(ticker)*0.33), asset_precision))
     print('Max_Amount: ' + str(amount))
     #issafe = False
     #if 'sell' in str(data):
@@ -177,7 +177,7 @@ def Action():
         # comment above out, to only entry long / short. Keep active, to enter short & long.
         #pickle.dump(positions, pos)
         with open('history.dat', 'rb') as history:
-            history_bu = history.load()
+            history_bu = pickle.load(history)
         with open('history.dat', 'wb') as history:
             history_bu[ticker] = float(amount)
             pickle.dump(history_bu, history)
