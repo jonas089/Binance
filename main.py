@@ -176,6 +176,11 @@ def Action():
         #positions[ticker] = 'Sell'
         # comment above out, to only entry long / short. Keep active, to enter short & long.
         #pickle.dump(positions, pos)
+        with open('history.dat', 'rb') as history:
+            history_bu = history.load()
+        with open('history.dat', 'wb') as history:
+            history_bu[ticker] = float(amount)
+            pickle.dump(history_bu, history)
 
         return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(float(amount) * leverage))
     else:
