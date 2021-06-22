@@ -5,7 +5,7 @@ import json
 import pickle
 import os
 # (RE)Create Files
-files = ['history.dat', 'first.dat', 'positions.dat', 'leverages.dat', 'precisions.dat']
+files = ['history.dat', 'first.dat', 'positions.dat', 'leverages.dat', 'precisions.dat', 'strategies.dat', 'log.txt']
 for f in range(0, len(files)):
     try:
         os.remove(files[f])
@@ -32,6 +32,10 @@ with open('leverages.dat', 'wb') as lev:
 with open('precisions.dat', 'wb') as pre:
     precisions = {'ADA':1, 'DOT':2, 'ETH':3}
     pickle.dump(precisions, pre)
+with open('strategies.dat', 'wb') as sg:
+    strategies = {'ETH':'None','ADA':'None','DOT':'None'}
+with open('log.txt', 'w') as log:
+    log.write('[DEBUG]:')
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
 secret_key = 'sYOZrlfkgcRpteYXUhYSvEmrngpwCu6TIdxhKYTXqMXzXJEQ1NCiFYW1AwD1MUvv'
 app = Flask(__name__)
@@ -58,9 +62,11 @@ def Action():
         data = request.get_json()['action']
         print(data)
         ticker = request.get_json()['ticker']
+        strategy = request.get_json()['strategy']
     except Exception as FormatError:
         data = request.json['action']
         ticker = request.json['ticker']
+        strategy = request.json['strategy']
     with open('precisions.dat', 'rb') as precisions:
         asset_precision = pickle.load(precisions)[ticker]
 
@@ -85,6 +91,23 @@ def Action():
         positions = pickle.load(pos)
         position = positions[ticker]
 
+    with open('strategies.dat', 'rb') as sg:
+        strategies = pickle.load(sg)
+        current_strategy = strategies[ticker]
+    if current_strategy == 'None':
+        strategies[ticker] = strategy
+        with open('strategies.dat', 'wb') as sg:
+            pickle.dump(strategies, sg)
+    elif current_strategy != strategy:
+        with open('log.txt', 'r') as log:
+            debug_log = log.read()
+        with open('log.txt', 'w') as log:
+            debug_log += '[W] Strategy ' + strategy + ' not in use!' + '\n' + 'Expected: ' + strategies[ticker] + '\n'
+        return 'Strategy not in use.'
+    elif current_strategy == strategy:
+        strategies[ticker] = 'None'
+        with open('strategies.dat', 'wb') as sg:
+            pickle.dump(strategies, sg)
     if str(data) == 'buy':
         with open('history.dat', 'rb') as history:
             history_bu = pickle.load(history)
