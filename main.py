@@ -74,7 +74,7 @@ def Action():
     with open('precisions.dat', 'rb') as precisions:
         asset_precision = pickle.load(precisions)[ticker]
 
-    amount = str(round((Balance()/Price(ticker))*0.5, asset_precision))
+    amount = str(round((Balance()/Price(ticker)*0.5), asset_precision))
     print('Max_Amount: ' + str(amount))
     #issafe = False
     #if 'sell' in str(data):
