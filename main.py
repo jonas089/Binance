@@ -34,6 +34,7 @@ with open('precisions.dat', 'wb') as pre:
     pickle.dump(precisions, pre)
 with open('strategies.dat', 'wb') as sg:
     strategies = {'ETH':'None','ADA':'None','DOT':'None'}
+    pickle.dump(strategies, sg)
 with open('log.txt', 'w') as log:
     log.write('[DEBUG]: ' + '\n')
 with open('tradelog.txt', 'w') as tradelog:
