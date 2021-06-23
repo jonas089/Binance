@@ -136,11 +136,11 @@ def Action():
                 positions[ticker] = 'Buy'
                 pickle.dump(positions, pos)
         elif position == 'Sell':
+            with open('history.dat', 'rb') as history:
+                positioned_amount = pickle.load(history)[ticker]
+            # Close old position and open new Long position,
+            client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(positioned_amount) * leverage))
             with open('positions.dat', 'wb') as pos:
-                with open('history.dat', 'rb') as history:
-                    positioned_amount = pickle.load(history)[ticker]
-                # Close old position and open new Long position,
-                client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(positioned_amount) * leverage))
                 positions[ticker] = 'Buy'
                 # comment above out, to only entry long / short. Keep active, to enter short & long.
                 pickle.dump(positions, pos)
