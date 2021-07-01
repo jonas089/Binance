@@ -92,7 +92,7 @@ if longCondition
     timeOfBuya := time
 
 
-longExitSignala = short
+longExitSpoignala = short
 exitLongCondition = longOpeneda[1] and longExitSignala
 
 if exitLongCondition

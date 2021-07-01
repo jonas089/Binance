@@ -138,12 +138,10 @@ def Action():
         elif position == 'Sell':
             with open('history.dat', 'rb') as history:
                 positioned_amount = pickle.load(history)[ticker]
-            # Close old position and open new Long position,
-            client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(positioned_amount) * leverage))
             with open('positions.dat', 'wb') as pos:
-                positions[ticker] = 'Buy'
-                # comment above out, to only entry long / short. Keep active, to enter short & long.
+                positions[ticker] = 'None'
                 pickle.dump(positions, pos)
+            return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(positioned_amount) * leverage))
         elif position == 'Buy':
             print('Already bought.')
             return 'Already bought.'
@@ -160,7 +158,10 @@ def Action():
         if position == 'Buy':
             with open('history.dat', 'rb') as history:
                 positioned_amount = pickle.load(history)[ticker]
-                client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverage))
+            with open('positions.dat', 'wb') as pos:
+                positions[ticker] = 'None'
+                pickle.dump(positions, pos)
+            return  client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverage))
         elif position == 'None':
             with open('positions.dat', 'wb') as pos:
                 positions[ticker] = 'Sell'
@@ -168,9 +169,9 @@ def Action():
         elif position == 'Sell':
             print('Already sold.')
             return('Already sold.')
-        with open('positions.dat', 'wb') as pos:
-            positions[ticker] = 'Sell'
-            pickle.dump(positions, pos)
+        #with open('positions.dat', 'wb') as pos:
+        #    positions[ticker] = 'Sell'
+        #    pickle.dump(positions, pos)
         #positions[ticker] = 'None'
                 # Close old position and open new Long position,
         #positions[ticker] = 'Sell'
