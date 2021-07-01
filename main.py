@@ -27,7 +27,7 @@ with open('positions.dat', 'wb') as pos:
     positions = {'ADA':'None', 'DOT':'None', 'ETH':'None'} #'XMR':'None'} XMR - Futures Price not supported by API
     pickle.dump(positions, pos)
 with open('leverages.dat', 'wb') as lev:
-    leverages = {'ADA':5, 'DOT':2, 'ETH':5} #'XMR':4} XMR - Futures Price not supported by API
+    leverages = {'ADA':3, 'DOT':3, 'ETH':3} #'XMR':4} XMR - Futures Price not supported by API
     pickle.dump(leverages, lev)
 with open('precisions.dat', 'wb') as pre:
     precisions = {'ADA':0, 'DOT':1, 'ETH':2}
