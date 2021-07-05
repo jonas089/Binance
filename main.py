@@ -5,7 +5,7 @@ import json
 import pickle
 import os
 # (RE)Create Files
-files = ['history.dat', 'first.dat', 'positions.dat', 'leverages.dat', 'precisions.dat', 'strategies.dat', 'log.txt', 'tradelog.txt']
+files = ['history.dat', 'first.dat', 'positions.dat', 'leverages.dat', 'precisions.dat', 'strategies.dat', 'log.txt', 'tradelog.txt', 'stratcout.dat']
 for f in range(0, len(files)):
     try:
         os.remove(files[f])
@@ -39,6 +39,9 @@ with open('log.txt', 'w') as log:
     log.write('[DEBUG]: ' + '\n')
 with open('tradelog.txt', 'w') as tradelog:
     tradelog.write('[Trades]: ' + '\n')
+with open('stratcout.dat', 'wb') as stratcout:
+    stratcounts = {'ETH':0, 'ADA':0, 'DOT':0}
+    pickle.dump(stratcounts, stratcout)
 api_key = 'w5WslwajZVtl45kJdSsU6aTDW55ZmMyn9vy7txcJnGTxmBzs92MV7hTnMCYDTyVE'
 secret_key = 'sYOZrlfkgcRpteYXUhYSvEmrngpwCu6TIdxhKYTXqMXzXJEQ1NCiFYW1AwD1MUvv'
 app = Flask(__name__)
@@ -94,11 +97,20 @@ def Action():
     with open('positions.dat', 'rb') as pos:
         positions = pickle.load(pos)
         position = positions[ticker]
-
+    with open('stratcout.dat', 'rb') as sc:
+        stratcout = pickle.load(sc)
     with open('strategies.dat', 'rb') as sg:
         strategies = pickle.load(sg)
         current_strategy = strategies[ticker]
+    if stratcout[ticker] == 2:
+        stratcout[ticker] = 0
+        strategies[ticker] = 'None'
+        with open('strategies.dat', 'rb') as sg:
+            pickle.dump(strategies, sg)
+        with open('stratcout.dat', 'rb') as sc:
+            pickle.dump(stratcout, cc)
     if current_strategy == 'None':
+        stratcout[ticker] += 1
         strategies[ticker] = strategy
         with open('strategies.dat', 'wb') as sg:
             pickle.dump(strategies, sg)
@@ -109,9 +121,12 @@ def Action():
             debug_log += '[W] Strategy ' + strategy + ' not in use!' + '\n' + 'Expected: ' + strategies[ticker] + '\n'
         return 'Strategy not in use.'
     elif current_strategy == strategy:
+        stratcout[ticker] += 1
         strategies[ticker] = 'None'
         with open('strategies.dat', 'wb') as sg:
             pickle.dump(strategies, sg)
+    with open('stratcout.dat', 'wb') as sc:
+        pickle.dump(stratcout, sc)        
     if str(data) == 'buy':
         #LOG
         with open('tradelog.txt', 'r') as tradelog:
