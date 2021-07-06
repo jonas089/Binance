@@ -127,16 +127,6 @@ def Action():
     with open('stratcout.dat', 'rb') as sc:
         stratcout = pickle.load(sc)
 
-    if stratcout[ticker] == 6:
-        stratcout[ticker] = 0
-        with open('strategies.dat', 'rb') as sg:
-            strategies = pickle.load(sg)
-            strategies[ticker] = 'None'
-        with open('strategies.dat', 'wb') as sg:
-            pickle.dump(strategies, sg)
-        with open('stratcout.dat', 'wb') as sc:
-            pickle.dump(stratcout, sc)
-
     if str(data) == 'buy':
         #LOG
         with open('tradelog.txt', 'r') as tradelog:
@@ -164,11 +154,17 @@ def Action():
             with open('history.dat', 'rb') as history:
                 positioned_amount = pickle.load(history)[ticker]
             # Close old position and open new Long position,
-            client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(positioned_amount) * leverage))
-            with open('positions.dat', 'wb') as pos:
-                positions[ticker] = 'Buy'
-                # comment above out, to only entry long / short. Keep active, to enter short & long.
-                pickle.dump(positions, pos)
+            if stratcout[ticker] != 4:
+                client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(positioned_amount) * leverage))
+                with open('positions.dat', 'wb') as pos:
+                    positions[ticker] = 'Buy'
+                    # comment above out, to only entry long / short. Keep active, to enter short & long.
+                    pickle.dump(positions, pos)
+            else:
+                with open('positions.dat', 'wb') as pos:
+                    position[ticker] = 'None'
+                    pickle.dump(positions, pos)
+
         elif position == 'Buy':
             print('Already bought.')
             return 'Already bought.'
@@ -185,7 +181,16 @@ def Action():
         if position == 'Buy':
             with open('history.dat', 'rb') as history:
                 positioned_amount = pickle.load(history)[ticker]
+            if stratcout[ticker] != 4:
+                with open('positions.dat', 'wb') as pos:
+                    positions[ticker] = 'Sell'
+                    pickle.dump(positions, pos)
                 client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(positioned_amount * leverage))
+            else:
+                with open('positions.dat', 'wb') as pos:
+                    positions[ticker] = 'None'
+                    pickle.dump(positions, pos)
+
         elif position == 'None':
             with open('positions.dat', 'wb') as pos:
                 positions[ticker] = 'Sell'
@@ -193,9 +198,6 @@ def Action():
         elif position == 'Sell':
             print('Already sold.')
             return('Already sold.')
-        with open('positions.dat', 'wb') as pos:
-            positions[ticker] = 'Sell'
-            pickle.dump(positions, pos)
         #positions[ticker] = 'None'
                 # Close old position and open new Long position,
         #positions[ticker] = 'Sell'
@@ -211,6 +213,16 @@ def Action():
     else:
         print('Warning: ' + str(data))
         return 'Invalid request data.'
+
+    if stratcout[ticker] == 4:
+        stratcout[ticker] = 0
+        with open('strategies.dat', 'rb') as sg:
+            strategies = pickle.load(sg)
+            strategies[ticker] = 'None'
+        with open('strategies.dat', 'wb') as sg:
+            pickle.dump(strategies, sg)
+        with open('stratcout.dat', 'wb') as sc:
+            pickle.dump(stratcout, sc)
 
 def OpenOrders():
     orders = client.futures_get_open_orders()
