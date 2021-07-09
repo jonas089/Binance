@@ -128,13 +128,6 @@ def Action():
         stratcout = pickle.load(sc)
 
     if str(data) == 'buy':
-        #LOG
-        with open('tradelog.txt', 'r') as tradelog:
-            trade_log = tradelog.read()
-        with open('tradelog.txt', 'w') as tradelog:
-            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Price: ' + str(Price(ticker)) + ' ' + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'BUY' + '\n'
-            tradelog.write(trade_log)
-
         with open('history.dat', 'rb') as history:
             history_bu = pickle.load(history)
         with open('history.dat', 'wb') as history:
@@ -169,15 +162,14 @@ def Action():
             print('Already bought.')
             return 'Already bought.'
 
-        return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(amount) * leverage))
-
-    elif str(data) == 'sell':
-        #LOG
         with open('tradelog.txt', 'r') as tradelog:
             trade_log = tradelog.read()
         with open('tradelog.txt', 'w') as tradelog:
-            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'SELL' + '\n'
+            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Price: ' + str(Price(ticker)) + ' ' + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'BUY' + '\n'
             tradelog.write(trade_log)
+        return client.futures_create_order(symbol=(ticker+'USDT'), side='BUY', type='MARKET', quantity=(float(amount) * leverage))
+
+    elif str(data) == 'sell':
         if position == 'Buy':
             with open('history.dat', 'rb') as history:
                 positioned_amount = pickle.load(history)[ticker]
@@ -208,6 +200,11 @@ def Action():
         with open('history.dat', 'wb') as history:
             history_bu[ticker] = float(amount)
             pickle.dump(history_bu, history)
+        with open('tradelog.txt', 'r') as tradelog:
+            trade_log = tradelog.read()
+        with open('tradelog.txt', 'w') as tradelog:
+            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'SELL' + '\n'
+            tradelog.write(trade_log)
 
         return client.futures_create_order(symbol=(ticker+'USDT'), side='SELL', type='MARKET', quantity=(float(amount) * leverage))
     else:
