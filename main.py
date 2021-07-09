@@ -132,7 +132,7 @@ def Action():
         with open('tradelog.txt', 'r') as tradelog:
             trade_log = tradelog.read()
         with open('tradelog.txt', 'w') as tradelog:
-            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'BUY' + '\n'
+            trade_log += '[TRADE]: ' + timestamp + ' | '  + 'Price: ' + str(Price(ticker)) + ' ' + 'Sym: ' + ticker + ' Sg: ' + strategy + ' Side: ' + 'BUY' + '\n'
             tradelog.write(trade_log)
 
         with open('history.dat', 'rb') as history:
